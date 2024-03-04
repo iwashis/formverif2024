@@ -20,8 +20,15 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
    - zdefiniować big-step semantics. Ponadto, wprowadzić trójki Hoare'a i udowodnić zgodność logiki Hoare'a (Tw. 14.2).
 
 3. **Verified compilation 2:**
-   - Certyfikowana kompilacja z języka prostych wyrażeń arytmetycznych do zabawkowego języka assembler.
+   - Certyfikowana kompilacja z języka prostych wyrażeń arytmetycznych 
+    `U ::=  n | U + U | U * U`
+    do zabawkowego języka assambler:
+    ```
+    Prog  ::= Begin;A
+    A     ::= Opper;A | End
+    Opper ::= Set n | Load x | Store x | Add x | Mul x
 
+    ```
 4. **Certyfikowana złożoność kilku wybranych funkcji (A)**
    - [https://projekter.aau.dk/projekter/files/335444832/pt101f20thesis.pdf](https://projekter.aau.dk/projekter/files/335444832/pt101f20thesis.pdf)
 
