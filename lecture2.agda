@@ -14,13 +14,19 @@ open import Data.Nat.Properties using (+-comm; +-identityʳ)
 data _≤_ : ℕ → ℕ → Set where
   z≤n : ∀ { n : ℕ } → zero ≤ n
   s≤s : ∀ { m } → ∀ { n } → m ≤ n → suc m ≤ suc n
+
 --
 -- Przykład dowodu
 _ : 2 ≤ 5
 _ = s≤s {1} {4} (s≤s {0} {3} ( z≤n {3}))
 
+
+--
+-- Dla przykładu i zabawy zdefiniujmy sobie inny typ danych
+-- Nie będziemy go używać dalej w kodzie.
 data _≥_≥_ : ℕ → ℕ → ℕ → Set where
  m≥n≥k : ∀ { m n k } → n ≤ m → k ≤ n → m ≥ n ≥ k
+
 --
 -- Ustalmy priorytety:
 infix 4 _≤_
@@ -28,7 +34,6 @@ infix 4 _≤_
 --
 -- Możemy udowodnić następujące twierdzenie:
 -- inv-s≤s : ∀ { m n } → suc m ≤ suc n → m ≤ n
-
 inv-s≤s : ∀ { m n } → suc m ≤ suc n → m ≤ n
 inv-s≤s {m} {n} (s≤s {m} {n} p) = p
 
@@ -38,9 +43,7 @@ inv-m≤zero : ∀ { m } → m ≤ zero → m ≡ zero
 inv-m≤zero z≤n = refl
 
 
--- Twierdzenia oraz
--- dowody zwrotności i przechodniości
--- relacji ≤
+-- Twierdzenia oraz dowody zwrotności i przechodniości relacji ≤
 ≤-refl : ∀ { m } → m ≤ m
 ≤-refl {zero} = z≤n
 ≤-refl {suc m} = s≤s ≤-refl
@@ -51,28 +54,25 @@ inv-m≤zero z≤n = refl
 
 --
 -- Twierdzenie + dowód antysymetryczność
---
 ≤-antisym : ∀ { m n } → m ≤ n → n ≤ m → m ≡ n
 ≤-antisym z≤n z≤n = refl
 -- klasycznie drugą definicji można przedstawić następująco:
 -- ≤-antisym {suc m} { suc n }(s≤s p1) (s≤s p2) = cong suc (≤-antisym p1 p2)
--- ale tym razem użyjmy słowa klucza rewrite:
-≤-antisym {suc m} { suc n }(s≤s p1) (s≤s p2) rewrite ≤-antisym p1 p2 = refl
-
 -- gdzie, typ cong (mniej więcej) wygląda następująco:
 -- cong : (f: A->B) -> a ≡ b -> f a ≡ f b
+-- ale tym razem użyjmy słowa klucza rewrite:
+≤-antisym {suc m} { suc n }(s≤s p1) (s≤s p2) rewrite ≤-antisym p1 p2 = refl
 
 -- Nasz porządek jest liniowy (Total order)
 -- Zwróćcie uwagę na notację!
 data Total (m n : ℕ) : Set where
   forward : m ≤ n → Total m n
   flipped : n ≤ m → Total m n
---
--- i porównajcie z taką definicją:
---
+-- i porównajcie z taką (równoważną) definicją:
 data Total' : ℕ → ℕ → Set where
   forward' : ∀ { m n } → m ≤ n → Total' m n
   flipped' : ∀ { m n } → n ≤ m → Total' m n
+
 --
 -- Jesteśmy teraz w stanie udowodnić
 -- ≤-total : ∀ (m n : ℕ) → Total m n
@@ -83,7 +83,8 @@ data Total' : ℕ → ℕ → Set where
 ...                        | forward m≤n  =  forward (s≤s m≤n)
 ...                        | flipped n≤m  =  flipped (s≤s n≤m)
 
---
+
+-- Praca domowa:
 -- Monotoniczność (jest na slajdach, ale proszę nie ściągać i udowodnić
 -- jako ćwiczenie)
 -- Udowodnimy:
@@ -94,12 +95,11 @@ data Total' : ℕ → ℕ → Set where
 -- +-monoˡ-≤ : ∀ (m n p : ℕ) → m ≤ n → m + p ≤ n + p
 --
 
--- Ćwiczenia:
+-- Praca domowa:
 -- Nierówność ostra
 data _<_ : ℕ → ℕ → Set where
 -- ...
---
--- dowodnić przechodniość, monotoniczność dla <
+-- udowodnić przechodniość, monotoniczność dla <
 -- oraz pokazać: < → ≤
 
 
@@ -108,8 +108,9 @@ data _<_ : ℕ → ℕ → Set where
 -- danej liczby naturalnej
 -- even i odd:
 data even : ℕ → Set
-data odd : ℕ → Set
+data odd  : ℕ → Set
 
+-- deklaracja typów jest wyżej, definicja następuje:
 data even where
   e_zero : even zero
   e_suc : ∀ { n } → odd n → even ( suc n )
@@ -117,11 +118,12 @@ data even where
 data odd where
   o_suc : ∀ {n} → even n → odd (suc n)
 
-
--- Pokazujemy, że:
+--
+-- Ponadto, pokazujemy, że:
 e+e≡e : ∀ { m n } → even m → even n → even ( m + n )
 o+e≡o : ∀ { m n } → odd m → even n → odd ( m + n )
-
+--
+-- znowu deklaracja typów była wyżej, a do definicji przechodzimy poniżej:
 e+e≡e {zero} {n} _ p = p
 e+e≡e {suc m} {n} (e_suc {m} proof_that_m_is_odd) p2 = e_suc helper
   where
