@@ -21,13 +21,10 @@ open import Data.Nat.Properties using (+-comm; +-identityʳ)
 -> # Typ reprezentujący częściowy porządek na liczbach naturalnych <- 
 ==============
 
-
-
 ```agda
 data _≤_ : ℕ → ℕ → Set where
  ...
 ```
-
 pierwszy dowod:
 ```agda
 _ : 2 ≤ 4 
@@ -36,20 +33,13 @@ _ = ?
 mamy następujące twierdzenia:
 
 ```
-inv-s≤s : ∀ {m n : ℕ}
-  → suc m ≤ suc n
-    -------------
-  → m ≤ n
+inv-s≤s : ∀ {m n : ℕ} → suc m ≤ suc n → m ≤ n
 ```
-
 oraz:
+```
+inv-z≤n : ∀ {m : ℕ} → m ≤ zero → m ≡ zero
+```
 
-```
-inv-z≤n : ∀ {m : ℕ}
-  → m ≤ zero
-    --------
-  → m ≡ zero
-```
 --------------------------------------------------
 
 -> # Total order <- 
