@@ -35,7 +35,7 @@ infix 4 _≤_
 
 
 -- Twierdzenia oraz
--- dowody zwrotności, symetryczności i przechodniości
+-- dowody zwrotności i przechodniości
 -- relacji ≤
 
 
