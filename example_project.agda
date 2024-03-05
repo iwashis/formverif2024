@@ -7,6 +7,7 @@ module example_project where
 
 open import Data.String.Base using (String)
 open import Data.Nat.Base using (ℕ)
+open import Data.Maybe using (Maybe; nothing; just)
 open import Data.Product using (_×_; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 
 
@@ -28,11 +29,16 @@ example_program₁ = ("foo") ≔ ( int 6 ) ⨾ ( ((int 7) ⊗ (int 8)) ⊕ (var 
 
 
 -- Under construction --
-Store : Set
-Store = Var → ℕ
+data Store : Set where
+  Empty : Store
+  _⟶_,_ : Var → ℕ → Store → Store
+
+check_value : Store → Var → Maybe ℕ
+check_value Empty y = nothing
+check_value( x ⟶  n , σ ) y = check_value σ y -- TODO
 
 Config : Set
 Config = Exp × Store
 
 data _◂_ : Config → Config → Set where
-  var_reduc : ∀ { x : Var } → ∀ { σ : Store } → ⟨ var x , σ ⟩ ◂ ⟨ int (σ x) , σ ⟩
+--  var_reduc : ∀ { x : Var } → ∀ { σ : Store } → ⟨ var x , σ ⟩ ◂ ⟨ int (σ x) , σ ⟩
