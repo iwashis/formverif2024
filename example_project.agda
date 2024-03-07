@@ -6,7 +6,7 @@ module example_project where
 -- wraz z jego semantyką small-step.
 
 open import Data.String.Base using (String)
-open import Data.Nat.Base using (ℕ)
+open import Data.Nat.Base using (ℕ; _+_; _*_)
 open import Data.Maybe using (Maybe; nothing; just)
 open import Data.Product using (_×_; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 
@@ -23,8 +23,9 @@ data Exp : Set where
 
 
 -- Przykładowe wyrażenie typu Exp:
-example_program₁ : Exp
-example_program₁ = ("foo") ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var "foo"))
+example₁ : Exp
+example₁ = ("foo") ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var "foo"))
+
 
 
 
@@ -56,3 +57,17 @@ data _↘_ : Config → Config → Set where
   right_add : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
             → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
             → ⟨ σ , f ⊕ e ⟩ ↘ ⟨ σ' , f ⊕ e' ⟩
+
+  add : ∀ { σ : Cntxt } → ∀ { m n }
+            → ⟨ σ , (int m) ⊕ (int n) ⟩ ↘ ⟨ σ , int ( m + n ) ⟩
+
+  left_mul : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
+            → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
+            → ⟨ σ , e ⊗ f ⟩ ↘ ⟨ σ' , e' ⊗ f ⟩
+
+  right_mul : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
+            → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
+            → ⟨ σ , f ⊗ e ⟩ ↘ ⟨ σ' , f ⊗ e' ⟩
+
+  mul : ∀ { σ : Cntxt } → ∀ { m n }
+            → ⟨ σ , (int m) ⊗ (int n) ⟩ ↘ ⟨ σ , int ( m * n ) ⟩
