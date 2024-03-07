@@ -24,21 +24,35 @@ data Exp : Set where
 
 -- Przykładowe wyrażenie typu Exp:
 example_program₁ : Exp
-example_program₁ = ("foo") ≔ ( int 6 ) ⨾ ( ((int 7) ⊗ (int 8)) ⊕ (var "foo") )
+example_program₁ = ("foo") ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var "foo"))
 
 
 
 -- Under construction --
-data Store : Set where
-  Empty : Store
-  _⟶_,_ : Var → ℕ → Store → Store
+data Cntxt : Set where
+  Ø : Cntxt
+  _⇉_,_ : Var → ℕ → Cntxt → Cntxt
 
-check_value : Store → Var → Maybe ℕ
-check_value Empty y = nothing
-check_value( x ⟶  n , σ ) y = check_value σ y -- TODO
+_++_ : Cntxt → Cntxt → Cntxt
+Ø ++ σ = σ
+(x ⇉ n , σ) ++ τ = x ⇉ n , (σ ++ τ)
 
 Config : Set
-Config = Exp × Store
+Config = Cntxt × Exp
 
-data _◂_ : Config → Config → Set where
---  var_reduc : ∀ { x : Var } → ∀ { σ : Store } → ⟨ var x , σ ⟩ ◂ ⟨ int (σ x) , σ ⟩
+data _↘_ : Config → Config → Set where
+  perm_as : ∀ { τ σ : Cntxt } → ∀ { e : Exp }
+            ------------------------------------------------------
+            → ⟨ τ ++ σ , e ⟩ ↘ ⟨ σ ++ τ , e ⟩
+
+  var_red : ∀ { x : Var } → ∀ { n } → ∀ { σ : Cntxt }
+            ------------------------------------------------------
+            → ⟨ (x ⇉ n , σ)  , var x  ⟩ ↘  ⟨  σ , int n ⟩ -- ⟨ (x ⇉ n , σ)  , int n ⟩
+
+  left_add : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
+            → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
+            → ⟨ σ , e ⊕ f ⟩ ↘ ⟨ σ' , e' ⊕ f ⟩
+
+  right_add : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
+            → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
+            → ⟨ σ , f ⊕ e ⟩ ↘ ⟨ σ' , f ⊕ e' ⟩
