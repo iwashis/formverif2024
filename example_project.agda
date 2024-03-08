@@ -12,24 +12,25 @@ open import Data.Product using (_×_; proj₁; proj₂) renaming (_,_ to ⟨_,_�
 
 
 Var : Set
-Var = String
+Var = ℕ
 -- Definiujemy składnię naszego języka:
 data Exp : Set where
   var   : Var → Exp
   int   : ℕ → Exp
-  _≔_⨾_ : String → Exp → Exp → Exp
+  _≔_⨾_ : Var → Exp → Exp → Exp
   _⊗_   : Exp → Exp → Exp
   _⊕_   : Exp → Exp → Exp
 
 
 -- Przykładowe wyrażenie typu Exp:
+foo = 1
+
 example₁ : Exp
-example₁ = ("foo") ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var "foo"))
+example₁ = foo ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var foo))
 
 
 
-
--- Under construction --
+-- Small-step semantics--
 data Cntxt : Set where
   Ø : Cntxt
   _⇉_,_ : Var → ℕ → Cntxt → Cntxt
@@ -38,6 +39,8 @@ _++_ : Cntxt → Cntxt → Cntxt
 Ø ++ σ = σ
 (x ⇉ n , σ) ++ τ = x ⇉ n , (σ ++ τ)
 
+_⟦_≔_⟧ : Cntxt → Var → ℕ → Cntxt
+σ ⟦ x ≔ n ⟧ = x ⇉ n , σ
 Config : Set
 Config = Cntxt × Exp
 
@@ -48,7 +51,7 @@ data _↘_ : Config → Config → Set where
 
   var_red : ∀ { x : Var } → ∀ { n } → ∀ { σ : Cntxt }
             ------------------------------------------------------
-            → ⟨ (x ⇉ n , σ)  , var x  ⟩ ↘  ⟨  σ , int n ⟩ -- ⟨ (x ⇉ n , σ)  , int n ⟩
+            → ⟨ (x ⇉ n , σ)  , var x  ⟩ ↘  ⟨ σ  , int n ⟩
 
   left_add : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
             → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
@@ -71,3 +74,19 @@ data _↘_ : Config → Config → Set where
 
   mul : ∀ { σ : Cntxt } → ∀ { m n }
             → ⟨ σ , (int m) ⊗ (int n) ⟩ ↘ ⟨ σ , int ( m * n ) ⟩
+
+  asg : ∀ { σ σ' : Cntxt } → ∀ { x : Var } → ∀ { n : ℕ } → ∀ { e₁ e₁' e₂ }
+            → ⟨ σ , e₁ ⟩ ↘ ⟨ σ' , e₁' ⟩
+            → ⟨ σ , (x ≔ e₁ ⨾ e₂) ⟩ ↘ ⟨ σ' , (x ≔ e₁' ⨾ e₂) ⟩
+
+  asg_int : ∀ { σ : Cntxt } → ∀ { x : Var } → ∀ { n : ℕ } → ∀ { e }
+            → ⟨ σ , x ≔ (int n) ⨾ e ⟩ ↘ ⟨ σ ⟦ x ≔ n ⟧ , e ⟩
+
+-- Przypomnijmy sobie nasze wyrażenie:
+-- example₁ = foo ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var foo))
+_ : ⟨ Ø , example₁ ⟩ ↘ ⟨ ( foo ⇉ 6 , Ø ) , ((int 7) ⊗ (int 8)) ⊕ (var foo) ⟩
+_ = asg_int
+
+
+-- _ : ⟨ Ø , example₁ ⟩ ↘ ⟨  Ø  , ((int 7) ⊗ (int 8)) ⊕ (int 6) ⟩
+-- _ = right_add asg_int
