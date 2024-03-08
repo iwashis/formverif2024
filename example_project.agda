@@ -51,7 +51,7 @@ data _↘_ : Config → Config → Set where
 
   varred : ∀ { x : Var } → ∀ { n } → ∀ { σ : Cntxt }
             ------------------------------------------------------
-            → ⟨ (x ⇉ n , σ)  , var x  ⟩ ↘  ⟨ σ  , int n ⟩
+            → ⟨ (x ⇉ n , σ)  , var x  ⟩ ↘  ⟨ (x ⇉ n , σ )  , int n ⟩
 
   leftadd : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
             → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
@@ -94,8 +94,36 @@ first_step : ⟨ Ø , example₁ ⟩ ↘ ⟨ ( foo ⇉ 6 , Ø ) , ((int 7) ⊗ (
 first_step = asgint
 
 
-_ : ⟨ Ø , example₁ ⟩ ↣ ⟨  Ø  , int 62 ⟩
+_ : ⟨ Ø , example₁ ⟩ ↣ ⟨ ( foo ⇉ 6 , Ø )  , int 62 ⟩
 _ = (take first_step) andThen
     take (rightadd varred) andThen
     take (leftadd mul) andThen
     take add
+
+
+-- Big-step semantics
+
+data _≡>_ : Config → Config → Set where
+  perm : ∀ { τ σ : Cntxt } → ∀ { e } → ∀ { n : ℕ }
+            ------------------------------------------------------
+          → ⟨ τ ++ σ , e ⟩ ≡> ⟨ τ ++ σ , int n ⟩
+          → ⟨ σ ++ τ , e ⟩ ≡> ⟨ σ ++ τ , int n ⟩
+
+  varred : ∀ { x : Var } → ∀ { n } → ∀ { σ : Cntxt }
+            ------------------------------------------------------
+          → ⟨ (x ⇉ n , σ)  , var x  ⟩  ≡> ⟨ (x ⇉ n , σ )  , int n ⟩
+
+  add : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ }
+          → ⟨ σ   , e₁ ⟩      ≡> ⟨  σ'' , int n₁ ⟩
+          → ⟨ σ'' , e₂ ⟩      ≡> ⟨  σ' , int n₂ ⟩
+          → ⟨ σ   , e₁ ⊗ e₂ ⟩ ≡> ⟨  σ' , int( n₁ * n₂ ) ⟩
+
+  mul : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ }
+          → ⟨ σ   , e₁ ⟩      ≡> ⟨  σ'' , int n₁ ⟩
+          → ⟨ σ'' , e₂ ⟩      ≡> ⟨  σ' , int n₂ ⟩
+          → ⟨ σ   , e₁ ⊗ e₂ ⟩ ≡> ⟨  σ' , int( n₁ * n₂ ) ⟩
+
+  asg : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ } → ∀ { x }
+          → ⟨ σ   , e₁ ⟩            ≡> ⟨ σ'' , int n₁ ⟩
+          → ⟨ σ'' ⟦ x ≔ n₁ ⟧ , e₂ ⟩ ≡> ⟨ σ' , int n₂ ⟩
+          → ⟨ σ   , x ≔ e₁ ⨾ e₂ ⟩   ≡> ⟨ σ' , int n₂ ⟩
