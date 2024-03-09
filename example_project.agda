@@ -197,6 +197,11 @@ lemma₄ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
        → m₁ * m₂ ≡ n
 lemma₄ refl = refl
 
+lemma₅ : ∀ { σ σ' } → ∀ { e e' } → ∀ { n }
+  → ⟨ σ , e ⟩ ↣ ⟨ σ' , (int n) ⟩
+  → ⟨ σ , e ⊕ e' ⟩ ↣ ⟨ σ' , (int n) ⊕ e' ⟩
+lemma₅ refl = refl
+lemma₅ (x andThen step) = {!!}
 
 -- Zgodność semantyki small-step z big-step:
 -- jeśli small-step semantics pozwala na obliczenie z e do int n (przy odpowiednich kontekstach)
