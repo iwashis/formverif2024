@@ -1,5 +1,3 @@
-{-# OPTIONS --rewriting --confluence-check #-}
-
 module example_project where
 
 
@@ -8,10 +6,6 @@ module example_project where
 -- wraz z jego semantyką small-step.
 
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Agda.Builtin.Equality.Rewrite
-
-{-# BUILTIN REWRITE _≡_ #-}
-
 open import Data.String.Base using (String)
 open import Data.Nat.Base using (ℕ; _+_; _*_)
 open import Data.Maybe using (Maybe; nothing; just)
