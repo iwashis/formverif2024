@@ -1,3 +1,5 @@
+{-# OPTIONS --rewriting --confluence-check #-}
+
 module example_project where
 
 
@@ -6,6 +8,10 @@ module example_project where
 -- wraz z jego semantyką small-step.
 
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Agda.Builtin.Equality.Rewrite
+
+{-# BUILTIN REWRITE _≡_ #-}
+
 open import Data.String.Base using (String)
 open import Data.Nat.Base using (ℕ; _+_; _*_)
 open import Data.Maybe using (Maybe; nothing; just)
@@ -153,7 +159,7 @@ data _≡>_ : Config → Config → Set where
           → ⟨ σ   , e₁ ⟩      ≡> ⟨  σ'' , int n₁ ⟩
           → ⟨ σ'' , e₂ ⟩      ≡> ⟨  σ' , int n₂ ⟩
             ------------------------------------------------------
-          → ⟨ σ   , e₁ ⊗ e₂ ⟩ ≡> ⟨  σ' , int( n₁ * n₂ ) ⟩
+          → ⟨ σ   , e₁ ⊕ e₂ ⟩ ≡> ⟨  σ' , int( n₁ + n₂ ) ⟩
 
   mul : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ }
           → ⟨ σ   , e₁ ⟩      ≡> ⟨  σ'' , int n₁ ⟩
@@ -169,8 +175,41 @@ data _≡>_ : Config → Config → Set where
           → ⟨ σ   , x ≔ e₁ ⨾ e₂ ⟩   ≡> ⟨ σ' , int n₂ ⟩
 
 
--- Zgodność semantyk
+lemma₁ : ∀ { σ σ' } → ∀ { n n' }
+       → ⟨ σ , int n ⟩ ↣ ⟨ σ' , int n' ⟩
+       → n ≡ n'
+lemma₁ refl = refl
+
+lemma₂ : ∀ { σ σ' } → ∀ { n n' }
+       → ⟨ σ , int n ⟩ ↣ ⟨ σ' , int n' ⟩
+       → σ ≡ σ'
+lemma₂ refl = refl
+
+lemma₃ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
+       → ⟨ σ , int (m₁ + m₂) ⟩ ↣ ⟨ σ' , int n ⟩
+       → m₁ + m₂ ≡ n
+lemma₃ refl = refl
+
+
+lemma₄ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
+         → ⟨ σ , int (m₁ * m₂) ⟩ ↣ ⟨ σ' , int n ⟩
+       → m₁ * m₂ ≡ n
+lemma₄ refl = refl
+
+
+-- Zgodność semantyk small-step z big-step
 theorem₁ : ∀ { σ σ' } → ∀ { e } → ∀ { n }
-          → ( ⟨ σ , e ⟩ ↣ ⟨ σ' , int n ⟩ )
+          → ⟨ σ , e ⟩ ↣ ⟨ σ' , int n ⟩
           → ⟨ σ , e ⟩ ≡> ⟨ σ' , int n ⟩
-theorem₁ = {!!}
+theorem₁ refl = intrefl
+theorem₁ {σ} {σ'} {e} {n} (varred {x} {n₁} σ⊢x≔n₁ andThen step) rewrite lemma₁ step | lemma₂ step = varred σ⊢x≔n₁
+theorem₁ (leftadd x andThen x₁) = {!!}
+theorem₁ (rightadd x andThen x₁) = {!!}
+theorem₁ {σ} {σ'} {e} {n} ((add {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₃ {σ} {σ'} {m₁} {m₂} {n} step
+... | refl | refl | refl = add intrefl intrefl
+theorem₁ (leftmul x andThen x₁) = {!!}
+theorem₁ (rightmul x andThen x₁) = {!!}
+theorem₁ {σ} {σ'} {e} {n} ((mul {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₄ {σ} {σ'} {m₁} {m₂} {n} step
+... | refl | refl | refl = mul intrefl intrefl
+theorem₁ (asg x andThen x₁) = {!!}
+theorem₁ (asgint x andThen x₁) = asg intrefl x (theorem₁ x₁)
