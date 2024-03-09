@@ -168,7 +168,15 @@ data _≡>_ : Config → Config → Set where
             ------------------------------------------------------
           → ⟨ σ   , x ≔ e₁ ⨾ e₂ ⟩   ≡> ⟨ σ' , int n₂ ⟩
 
+------------------------------------
+--
+-- Zgodność semantyk
+--
+------------------------------------
 
+
+
+-- Lematy potrzebne do udowodnienia zgodności
 lemma₁ : ∀ { σ σ' } → ∀ { n n' }
        → ⟨ σ , int n ⟩ ↣ ⟨ σ' , int n' ⟩
        → n ≡ n'
@@ -184,26 +192,27 @@ lemma₃ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
        → m₁ + m₂ ≡ n
 lemma₃ refl = refl
 
-
 lemma₄ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
          → ⟨ σ , int (m₁ * m₂) ⟩ ↣ ⟨ σ' , int n ⟩
        → m₁ * m₂ ≡ n
 lemma₄ refl = refl
 
 
--- Zgodność semantyk small-step z big-step
+-- Zgodność semantyki small-step z big-step:
+-- jeśli small-step semantics pozwala na obliczenie z e do int n (przy odpowiednich kontekstach)
+-- to big-step semantics też na to pozwala:
 theorem₁ : ∀ { σ σ' } → ∀ { e } → ∀ { n }
           → ⟨ σ , e ⟩ ↣ ⟨ σ' , int n ⟩
           → ⟨ σ , e ⟩ ≡> ⟨ σ' , int n ⟩
 theorem₁ refl = intrefl
 theorem₁ {σ} {σ'} {e} {n} (varred {x} {n₁} σ⊢x≔n₁ andThen step) rewrite lemma₁ step | lemma₂ step = varred σ⊢x≔n₁
-theorem₁ (leftadd x andThen x₁) = {!!}
-theorem₁ (rightadd x andThen x₁) = {!!}
+theorem₁ (leftadd smol andThen step) = {!!}
+theorem₁ (rightadd smol andThen step) = {!!}
 theorem₁ {σ} {σ'} {e} {n} ((add {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₃ {σ} {σ'} {m₁} {m₂} {n} step
 ... | refl | refl | refl = add intrefl intrefl
 theorem₁ (leftmul x andThen x₁) = {!!}
 theorem₁ (rightmul x andThen x₁) = {!!}
 theorem₁ {σ} {σ'} {e} {n} ((mul {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₄ {σ} {σ'} {m₁} {m₂} {n} step
 ... | refl | refl | refl = mul intrefl intrefl
-theorem₁ (asg x andThen x₁) = {!!}
-theorem₁ (asgint x andThen x₁) = asg intrefl x (theorem₁ x₁)
+theorem₁ {σ} {σ'} {e} {n} (asg smol andThen step) = {!!}
+theorem₁ (asgint x andThen step) = asg intrefl x (theorem₁ step)
