@@ -60,12 +60,6 @@ data _∉_ : Var → Cntxt → Set where
   x∉Ø : ∀ { x } → x ∉ Ø
   x∉σ : ∀ { x y } →  ∀ {σ } → ∀ { n } → ¬ (x ≡ y) → x ∉ σ → x ∉ ( y ⇉ n , σ )
 
-
--- konkatenacja pamieci
-_++_ : Cntxt → Cntxt → Cntxt
-Ø ++ σ = σ
-(x ⇉ n , σ) ++ τ = x ⇉ n , (σ ++ τ)
-
 -- dorzucienie nowej komórki do pamięci
 _⟦_≔_⟧ : Cntxt → Var → ℕ → Cntxt
 σ ⟦ x ≔ n ⟧ = x ⇉ n , σ
