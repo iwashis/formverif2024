@@ -49,35 +49,33 @@ data Cntxt : Set where
   Ø : Cntxt
   _⇉_,_ : Var → ℕ → Cntxt → Cntxt
 
--- konkatenacja pamieci
-_++_ : Cntxt → Cntxt → Cntxt
-Ø ++ σ = σ
-(x ⇉ n , σ) ++ τ = x ⇉ n , (σ ++ τ)
-
--- dorzucienie nowej komórki do pamięci
-_⟦_≔_⟧ : Cntxt → Var → ℕ → Cntxt
-σ ⟦ x ≔ n ⟧ = x ⇉ n , σ
-Config : Set
-Config = Cntxt × Exp
+-- typ dzięki ktoremu jestesmy w stanie wywnioskować czy dane przypisanie jest w kontekście
+data _⊢_≔_ : Cntxt → Var → ℕ → Set where
+  top : ∀ { x } → ∀ {n} → ∀ { σ } → (x ⇉ n , σ) ⊢ x ≔ n
+  tail : ∀ { x y } → ∀ { m n } → ∀ { σ  } → ( σ  ⊢ x ≔ n ) → ( y ⇉ m , σ ) ⊢ x ≔ n
 
 -- typ, dzięki ktoremu będziemy mieli pewność, że nie dorzucimy dwa razy tej samej
--- nazwy zmiennej
+-- nazwy zmiennej do kontekstu
 data _∉_ : Var → Cntxt → Set where
   x∉Ø : ∀ { x } → x ∉ Ø
   x∉σ : ∀ { x y } →  ∀ {σ } → ∀ { n } → ¬ (x ≡ y) → x ∉ σ → x ∉ ( y ⇉ n , σ )
 
+-- dorzucienie nowej komórki do pamięci
+_⟦_≔_⟧ : Cntxt → Var → ℕ → Cntxt
+σ ⟦ x ≔ n ⟧ = x ⇉ n , σ
+
+-- Pary: pamięć, wyrażenie
+Config : Set
+Config = Cntxt × Exp
 
 
 
 -- Small-step semantics--
 data _↘_ : Config → Config → Set where
-  perm : ∀ { τ σ : Cntxt } → ∀ { e : Exp }
-            ------------------------------------------------------
-            → ⟨ τ ++ σ , e ⟩ ↘ ⟨ σ ++ τ , e ⟩
-
   varred : ∀ { x : Var } → ∀ { n } → ∀ { σ : Cntxt }
+            → σ ⊢ x ≔ n
             ------------------------------------------------------
-            → ⟨ (x ⇉ n , σ)  , var x  ⟩ ↘  ⟨ (x ⇉ n , σ )  , int n ⟩
+            → ⟨ σ  , var x  ⟩ ↘  ⟨ σ  , int n ⟩
 
   leftadd : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
             → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
@@ -118,10 +116,13 @@ data _↘_ : Config → Config → Set where
             → ⟨ σ , x ≔ (int n) ⨾ e ⟩ ↘ ⟨ σ ⟦ x ≔ n ⟧ , e ⟩
 
 data _↣_ : Config → Config → Set where
-  take : ∀ { c c' } → (c ↘ c') → (c ↣ c')
-  _andThen_ : ∀ {c c' c'' } → (c ↣ c') → (c' ↣ c'') → (c ↣ c'')
+  refl : ∀ { c } → (c ↣ c)
+  _andThen_ : ∀ {c c' c'' } → (c ↘ c') → (c' ↣ c'') → (c ↣ c'')
 
 infixr 6 _andThen_
+
+pure : ∀ { c c' } → c ↘ c' → c ↣ c'
+pure x = x andThen refl
 
 -- Przypomnijmy sobie nasze wyrażenie:
 -- example₁ = foo ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var foo))
@@ -130,29 +131,29 @@ first_step = asgint x∉Ø
 
 
 _ : ⟨ Ø , example₁ ⟩ ↣ ⟨ ( foo ⇉ 6 , Ø )  , int 62 ⟩
-_ = (take first_step) andThen
-    take (rightadd varred) andThen
-    take (leftadd mul) andThen
-    take add
+_ = first_step andThen
+    (rightadd (varred top)) andThen
+    (leftadd mul) andThen
+    add andThen refl
 
 
 -- Big-step semantics
 
 data _≡>_ : Config → Config → Set where
-  perm : ∀ { τ σ : Cntxt } → ∀ { e } → ∀ { n : ℕ }
-          → ⟨ τ ++ σ , e ⟩ ≡> ⟨ τ ++ σ , int n ⟩
+  intrefl : ∀ { σ } → ∀ { n }
             ------------------------------------------------------
-          → ⟨ σ ++ τ , e ⟩ ≡> ⟨ σ ++ τ , int n ⟩
+          → ⟨ σ , int n ⟩ ≡> ⟨ σ , int n ⟩
 
   varred : ∀ { x : Var } → ∀ { n } → ∀ { σ : Cntxt }
+          → σ ⊢ x ≔ n
             ------------------------------------------------------
-          → ⟨ (x ⇉ n , σ)  , var x  ⟩  ≡> ⟨ (x ⇉ n , σ )  , int n ⟩
+          → ⟨ σ  , var x  ⟩  ≡> ⟨ σ  , int n ⟩
 
   add : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ }
           → ⟨ σ   , e₁ ⟩      ≡> ⟨  σ'' , int n₁ ⟩
           → ⟨ σ'' , e₂ ⟩      ≡> ⟨  σ' , int n₂ ⟩
             ------------------------------------------------------
-          → ⟨ σ   , e₁ ⊗ e₂ ⟩ ≡> ⟨  σ' , int( n₁ * n₂ ) ⟩
+          → ⟨ σ   , e₁ ⊕ e₂ ⟩ ≡> ⟨  σ' , int( n₁ + n₂ ) ⟩
 
   mul : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ }
           → ⟨ σ   , e₁ ⟩      ≡> ⟨  σ'' , int n₁ ⟩
@@ -167,3 +168,56 @@ data _≡>_ : Config → Config → Set where
             ------------------------------------------------------
           → ⟨ σ   , x ≔ e₁ ⨾ e₂ ⟩   ≡> ⟨ σ' , int n₂ ⟩
 
+------------------------------------
+--
+-- Zgodność semantyk
+--
+------------------------------------
+
+
+
+-- Lematy potrzebne do udowodnienia zgodności
+lemma₁ : ∀ { σ σ' } → ∀ { n n' }
+       → ⟨ σ , int n ⟩ ↣ ⟨ σ' , int n' ⟩
+       → n ≡ n'
+lemma₁ refl = refl
+
+lemma₂ : ∀ { σ σ' } → ∀ { n n' }
+       → ⟨ σ , int n ⟩ ↣ ⟨ σ' , int n' ⟩
+       → σ ≡ σ'
+lemma₂ refl = refl
+
+lemma₃ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
+       → ⟨ σ , int (m₁ + m₂) ⟩ ↣ ⟨ σ' , int n ⟩
+       → m₁ + m₂ ≡ n
+lemma₃ refl = refl
+
+lemma₄ : ∀ { σ σ' } → ∀ { m₁ m₂ n }
+         → ⟨ σ , int (m₁ * m₂) ⟩ ↣ ⟨ σ' , int n ⟩
+       → m₁ * m₂ ≡ n
+lemma₄ refl = refl
+
+lemma₅ : ∀ { σ σ' } → ∀ { e e' } → ∀ { n }
+  → ⟨ σ , e ⟩ ↣ ⟨ σ' , (int n) ⟩
+  → ⟨ σ , e ⊕ e' ⟩ ↣ ⟨ σ' , (int n) ⊕ e' ⟩
+lemma₅ refl = refl
+lemma₅ (x andThen step) = {!!}
+
+-- Zgodność semantyki small-step z big-step:
+-- jeśli small-step semantics pozwala na obliczenie z e do int n (przy odpowiednich kontekstach)
+-- to big-step semantics też na to pozwala:
+theorem₁ : ∀ { σ σ' } → ∀ { e } → ∀ { n }
+          → ⟨ σ , e ⟩ ↣ ⟨ σ' , int n ⟩
+          → ⟨ σ , e ⟩ ≡> ⟨ σ' , int n ⟩
+theorem₁ refl = intrefl
+theorem₁ {σ} {σ'} {e} {n} (varred {x} {n₁} σ⊢x≔n₁ andThen step) rewrite lemma₁ step | lemma₂ step = varred σ⊢x≔n₁
+theorem₁ (leftadd smol andThen step) = {!!}
+theorem₁ (rightadd smol andThen step) = {!!}
+theorem₁ {σ} {σ'} {e} {n} ((add {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₃ {σ} {σ'} {m₁} {m₂} {n} step
+... | refl | refl | refl = add intrefl intrefl
+theorem₁ (leftmul x andThen x₁) = {!!}
+theorem₁ (rightmul x andThen x₁) = {!!}
+theorem₁ {σ} {σ'} {e} {n} ((mul {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₄ {σ} {σ'} {m₁} {m₂} {n} step
+... | refl | refl | refl = mul intrefl intrefl
+theorem₁ {σ} {σ'} {e} {n} (asg smol andThen step) = {!!}
+theorem₁ (asgint x andThen step) = asg intrefl x (theorem₁ step)
