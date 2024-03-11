@@ -54,3 +54,13 @@ sym-≐ {A} {x} {y} x≐y P Py = x≐y Q (λ x → x) Py
   where
    Q : A → Set
    Q z = P z → P x
+
+refl-≐ : ∀ { A : Set } → ∀ { x : A } → x ≐ x
+refl-≐ P Px = Px
+
+trans-≐ : ∀ {A : Set} → ∀ { x y z : A } → x ≐ y → y ≐ z → x ≐ z
+trans-≐ xy yz P Px = yz P ( xy P Px )
+
+≡-implies-≐ : ∀ {A : Set} {x y : A} → x ≡ y → x ≐ y
+≡-implies-≐ refl P Px = Px
+-- Praca domowa: udowodnić implikację w drugą stronę

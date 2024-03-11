@@ -30,6 +30,7 @@ data Exp : Set where
 
 -- na potrzeby przykładów wprowadzmy nazwe zmiennej (u nas zmienne są liczbami)
 foo = 1
+bar = 2
 -- i zdefiniujmy przykładowe wyrażenie typu Exp:
 example₁ : Exp
 example₁ = foo ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var foo))
@@ -49,12 +50,17 @@ data Cntxt : Set where
   Ø : Cntxt
   _⇉_,_ : Var → ℕ → Cntxt → Cntxt
 
+example_context = foo ⇉ 6 , (  foo ⇉ 7 , Ø )
 -- typ dzięki ktoremu jestesmy w stanie wywnioskować czy dane przypisanie jest w kontekście
 data _⊢_≔_ : Cntxt → Var → ℕ → Set where
   top : ∀ { x } → ∀ {n} → ∀ { σ } → (x ⇉ n , σ) ⊢ x ≔ n
   tail : ∀ { x y } → ∀ { m n } → ∀ { σ  } → ( σ  ⊢ x ≔ n ) → ( y ⇉ m , σ ) ⊢ x ≔ n
 
--- typ, dzięki ktoremu będziemy mieli pewność, że nie dorzucimy dwa razy tej samej
+_ : example_context ⊢ foo ≔ 6
+_ = top
+_ : example_context ⊢ foo ≔ 7
+_ = tail top
+-- typ , dzięki ktoremu będziemy mieli pewność, że nie dorzucimy dwa razy tej samej
 -- nazwy zmiennej do kontekstu
 data _∉_ : Var → Cntxt → Set where
   x∉Ø : ∀ { x } → x ∉ Ø
