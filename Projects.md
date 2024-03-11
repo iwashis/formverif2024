@@ -40,6 +40,7 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
 
 7. **Formalizacja Simplified Calculus of Communicating Systems**
    - [http://www.lfcs.inf.ed.ac.uk/reports/86/ECS-LFCS-86-7/ECS-LFCS-86-7.pdf](http://www.lfcs.inf.ed.ac.uk/reports/86/ECS-LFCS-86-7/ECS-LFCS-86-7.pdf)
+   (rezerwacja DS, PL)
 
 8. **Formalizacja logiki rachunku zdań (pełność i zgodność)**:
     - [https://akaposi.github.io/proplogic.pdf]
