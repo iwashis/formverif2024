@@ -50,7 +50,7 @@ _≐_ : ∀ {A : Set} (x y : A) → Set₁
 _≐_ {A} x y = ∀ (P : A → Set) → P x → P y
 
 sym-≐ : ∀ { A : Set } → ∀ { x y : A } → x ≐ y → y ≐ x -- ∀ ( P ) → P y → P x
-sym-≐ {A} {x} {y} eq P Py = eq Q (λ x → x) Py
+sym-≐ {A} {x} {y} x≐y P Py = x≐y Q (λ x → x) Py
   where
-    Q : A → Set
-    Q z = P z → P x
+   Q : A → Set
+   Q z = P z → P x
