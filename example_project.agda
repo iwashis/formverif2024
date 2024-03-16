@@ -88,10 +88,10 @@ data _↘_ : Config → Config → Set where
             ------------------------------------------------------
             → ⟨ σ , e ⊕ f ⟩ ↘ ⟨ σ' , e' ⊕ f ⟩
 
-  rightadd : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
+  rightadd : ∀ { σ σ' : Cntxt } → ∀ { e e' : Exp } → ∀ { n }
             → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
             ------------------------------------------------------
-            → ⟨ σ , f ⊕ e ⟩ ↘ ⟨ σ' , f ⊕ e' ⟩
+            → ⟨ σ , int n ⊕ e ⟩ ↘ ⟨ σ' , int n ⊕ e' ⟩
 
   add : ∀ { σ : Cntxt } → ∀ { m n }
             ------------------------------------------------------
@@ -102,10 +102,10 @@ data _↘_ : Config → Config → Set where
             ------------------------------------------------------
             → ⟨ σ , e ⊗ f ⟩ ↘ ⟨ σ' , e' ⊗ f ⟩
 
-  rightmul : ∀ { σ σ' : Cntxt } → ∀ { e e' f : Exp }
+  rightmul : ∀ { σ σ' : Cntxt } → ∀ { e e' : Exp } → ∀ { n }
             → ⟨ σ , e ⟩ ↘ ⟨ σ' , e' ⟩
             ------------------------------------------------------
-            → ⟨ σ , f ⊗ e ⟩ ↘ ⟨ σ' , f ⊗ e' ⟩
+            → ⟨ σ , int n ⊗ e ⟩ ↘ ⟨ σ' , int n ⊗ e' ⟩
 
   mul : ∀ { σ : Cntxt } → ∀ { m n }
             ------------------------------------------------------
@@ -138,10 +138,9 @@ first_step = asgint x∉Ø
 
 _ : ⟨ Ø , example₁ ⟩ ↣ ⟨ ( foo ⇉ 6 , Ø )  , int 62 ⟩
 _ = first_step andThen
-    (rightadd (varred top)) andThen
-    (leftadd mul) andThen
-    add andThen refl
-
+    leftadd mul andThen
+    rightadd (varred top)
+    andThen pure add
 
 -- Big-step semantics
 
