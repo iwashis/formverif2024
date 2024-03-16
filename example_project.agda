@@ -50,21 +50,24 @@ data Cntxt : Set where
   Ø : Cntxt
   _⇉_,_ : Var → ℕ → Cntxt → Cntxt
 
-example_context = foo ⇉ 6 , (  foo ⇉ 7 , Ø )
+-- przykład kontekstu
+example_context = foo ⇉ 6 , (  bar ⇉ 7 , Ø )
+
 -- typ dzięki ktoremu jestesmy w stanie wywnioskować czy dane przypisanie jest w kontekście
 data _⊢_≔_ : Cntxt → Var → ℕ → Set where
-  top : ∀ { x } → ∀ {n} → ∀ { σ } → (x ⇉ n , σ) ⊢ x ≔ n
-  tail : ∀ { x y } → ∀ { m n } → ∀ { σ  } → ( σ  ⊢ x ≔ n ) → ( y ⇉ m , σ ) ⊢ x ≔ n
+  top : ∀ { x } → ∀ {n} → ∀ { σ }
+    → (x ⇉ n , σ) ⊢ x ≔ n
+  tail : ∀ { x y } → ∀ { m n } → ∀ { σ  }
+    → ( σ  ⊢ x ≔ n )
+    → ¬ ( x ≡ y ) -- dodatkowo zakładamy, że jeśli sprawdzamy, czy zmienna jest dalej w ciągu, to upewniamy się,
+                  -- że nie jest na pierwszej pozycji
+    → ( y ⇉ m , σ ) ⊢ x ≔ n
 
+-- przykłady wnioskowania o kontekście
 _ : example_context ⊢ foo ≔ 6
 _ = top
-_ : example_context ⊢ foo ≔ 7
-_ = tail top
--- typ , dzięki ktoremu będziemy mieli pewność, że nie dorzucimy dwa razy tej samej
--- nazwy zmiennej do kontekstu
-data _∉_ : Var → Cntxt → Set where
-  x∉Ø : ∀ { x } → x ∉ Ø
-  x∉σ : ∀ { x y } →  ∀ {σ } → ∀ { n } → ¬ (x ≡ y) → x ∉ σ → x ∉ ( y ⇉ n , σ )
+_ : example_context ⊢ bar ≔ 7
+_ = tail top λ ()
 
 -- dorzucienie nowej komórki do pamięci
 _⟦_≔_⟧ : Cntxt → Var → ℕ → Cntxt
@@ -117,7 +120,6 @@ data _↘_ : Config → Config → Set where
             → ⟨ σ , (x ≔ e₁ ⨾ e₂) ⟩ ↘ ⟨ σ' , (x ≔ e₁' ⨾ e₂) ⟩
 
   asgint : ∀ { σ : Cntxt } → ∀ { x : Var } → ∀ { n : ℕ } → ∀ { e }
-            →  x ∉ σ
             ------------------------------------------------------
             → ⟨ σ , x ≔ (int n) ⨾ e ⟩ ↘ ⟨ σ ⟦ x ≔ n ⟧ , e ⟩
 
@@ -133,7 +135,7 @@ pure x = x andThen refl
 -- Przypomnijmy sobie nasze wyrażenie:
 -- example₁ = foo ≔ ( int 6 ) ⨾ (((int 7) ⊗ (int 8)) ⊕ (var foo))
 first_step : ⟨ Ø , example₁ ⟩ ↘ ⟨ ( foo ⇉ 6 , Ø ) , ((int 7) ⊗ (int 8)) ⊕ (var foo) ⟩
-first_step = asgint x∉Ø
+first_step = asgint
 
 
 _ : ⟨ Ø , example₁ ⟩ ↣ ⟨ ( foo ⇉ 6 , Ø )  , int 62 ⟩
@@ -143,7 +145,6 @@ _ = first_step andThen
     andThen pure add
 
 -- Big-step semantics
-
 data _≡>_ : Config → Config → Set where
   intrefl : ∀ { σ } → ∀ { n }
             ------------------------------------------------------
@@ -168,18 +169,15 @@ data _≡>_ : Config → Config → Set where
 
   asg : ∀ { σ σ' σ'' } → ∀ { n₁ n₂ } → ∀ { e₁ e₂ } → ∀ { x }
           → ⟨ σ   , e₁ ⟩            ≡> ⟨ σ'' , int n₁ ⟩
-          → x ∉ σ'' -- tu musimy założyć, że z kontekstem σ'' jest wszystko ok
           → ⟨ σ'' ⟦ x ≔ n₁ ⟧ , e₂ ⟩ ≡> ⟨ σ' , int n₂ ⟩
             ------------------------------------------------------
           → ⟨ σ   , x ≔ e₁ ⨾ e₂ ⟩   ≡> ⟨ σ' , int n₂ ⟩
 
 ------------------------------------
 --
--- Zgodność semantyk
+-- Sekcja: Zgodność semantyk
 --
 ------------------------------------
-
-
 
 -- Lematy potrzebne do udowodnienia zgodności
 lemma₁ : ∀ { σ σ' } → ∀ { n n' }
@@ -225,4 +223,4 @@ theorem₁ (rightmul x andThen x₁) = {!!}
 theorem₁ {σ} {σ'} {e} {n} ((mul {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₄ {σ} {σ'} {m₁} {m₂} {n} step
 ... | refl | refl | refl = mul intrefl intrefl
 theorem₁ {σ} {σ'} {e} {n} (asg smol andThen step) = {!!}
-theorem₁ (asgint x andThen step) = asg intrefl x (theorem₁ step)
+theorem₁ (asgint andThen step) = asg intrefl (theorem₁ step)
