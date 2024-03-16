@@ -206,7 +206,7 @@ lemma₅ : ∀ { σ σ' } → ∀ { e e' } → ∀ { n }
   → ⟨ σ , e ⟩ ↣ ⟨ σ' , (int n) ⟩
   → ⟨ σ , e ⊕ e' ⟩ ↣ ⟨ σ' , (int n) ⊕ e' ⟩
 lemma₅ refl = refl
-lemma₅ (x andThen step) = {!!}
+lemma₅ (single-step andThen step) = leftadd single-step andThen lemma₅ step
 
 -- Zgodność semantyki small-step z big-step:
 -- jeśli small-step semantics pozwala na obliczenie z e do int n (przy odpowiednich kontekstach)
