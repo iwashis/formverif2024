@@ -1,6 +1,6 @@
 %title: Metody Formalne, wykład 3 
 %author: Tomasz Brengos
-%date: 2024-03-10
+%date: 2024-03-11
 
 
 
