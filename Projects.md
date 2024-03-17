@@ -29,7 +29,7 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
     Opper ::= Set n | Load x | Store x | Add x | Mul x
 
     ```
-    (rezerwacja MS, MZ)
+    (rezerwacja SM, ZM)
 
 4. **Certyfikowana złożoność kilku wybranych funkcji (A)**
    - [https://projekter.aau.dk/projekter/files/335444832/pt101f20thesis.pdf](https://projekter.aau.dk/projekter/files/335444832/pt101f20thesis.pdf)
@@ -40,6 +40,8 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
 
 6. **Formalizacja uproszczonego modelu sieci Bitcoin (A):**
    - [https://repositorio.fgv.br/server/api/core/bitstreams/3d0e0572-2fcd-4d89-88b5-422bcb231789/content](https://repositorio.fgv.br/server/api/core/bitstreams/3d0e0572-2fcd-4d89-88b5-422bcb231789/content)
+
+   (rezerwacja JD, KL, OW)
 
 7. **Formalizacja Simplified Calculus of Communicating Systems**
    - [http://www.lfcs.inf.ed.ac.uk/reports/86/ECS-LFCS-86-7/ECS-LFCS-86-7.pdf](http://www.lfcs.inf.ed.ac.uk/reports/86/ECS-LFCS-86-7/ECS-LFCS-86-7.pdf)
