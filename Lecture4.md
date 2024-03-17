@@ -326,7 +326,7 @@ Własności
 ==============
 
 
-
+```
 data _⊎_ (A B : Set) : Set where
 
   inj₁ :
@@ -338,7 +338,68 @@ data _⊎_ (A B : Set) : Set where
       B
       -----
     → A ⊎ B
+```
 
+```
+case-⊎ : ∀ {A B C : Set}
+  → (A → C)
+  → (B → C)
+  → A ⊎ B
+    -----------
+  → C
+η-⊎ : ∀ {A B : Set} (w : A ⊎ B) → case-⊎ inj₁ inj₂ w ≡ w
+uniq-⊎ : ∀ {A B C : Set} (h : A ⊎ B → C) (w : A ⊎ B) →
+  case-⊎ (h ∘ inj₁) (h ∘ inj₂) w ≡ h w
+
+infixr 1 _⊎_
+```
+
+
+--------------------------------------------------
+
+
+-> # Fałsz, czyli typ bez świadków <- 
+==============
+
+
+
+```agda
+data ⊥ : Set where
+```
+
+Własności:
+
+```
+⊥-elim : ∀ {A : Set}
+  → ⊥
+    --
+  → A  
+
+
+uniq-⊥ : ∀ {C : Set} (h : ⊥ → C) (w : ⊥) → ⊥-elim w ≡ h w
+
+```
+
+--------------------------------------------------
+
+-> # Implikacja to funkcja <- 
+==============
+
+
+
+```agda
+→-elim : ∀ {A B : Set}
+  → (A → B)
+  → A
+    -------
+  → B
+```
+
+Własność:
+
+```
+currying : ∀ {A B C : Set} → (A → B → C) ≃ (A × B → C)
+```
 
 --------------------------------------------------
 
@@ -346,4 +407,9 @@ data _⊎_ (A B : Set) : Set where
 -> # Praca domowa <- 
 ==============
 
-Pokazać, że `A ⇔ B` jest równoważne `(A → B) × (B → A)`
+1. Pokazać, że `A ⇔ B` jest równoważne `(A → B) × (B → A)`.
+2. Pokazać łączność i przemienność `_⊎_` (z dokładnością do izomorfizmu).
+3. Pokazać rozdzielność `→-distrib-⊎ : ∀ {A B C : Set} → (A ⊎ B → C) ≃ ((A → C) × (B → C))`
+4. Pokazać rozdzielność `→-distrib-× : ∀ {A B C : Set} → (A → B × C) ≃ (A → B) × (A → C)`
+5. Pokazać rozdzielność `×-distrib-⊎ : ∀ {A B C : Set} → (A ⊎ B) × C ≃ (A × C) ⊎ (B × C)`
+

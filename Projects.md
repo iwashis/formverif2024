@@ -29,6 +29,8 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
     Opper ::= Set n | Load x | Store x | Add x | Mul x
 
     ```
+    (rezerwacja MS, MZ)
+
 4. **Certyfikowana złożoność kilku wybranych funkcji (A)**
    - [https://projekter.aau.dk/projekter/files/335444832/pt101f20thesis.pdf](https://projekter.aau.dk/projekter/files/335444832/pt101f20thesis.pdf)
 
