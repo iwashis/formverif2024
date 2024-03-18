@@ -9,6 +9,7 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
        - `L2: Expressions e :: x | n |e + e| *{e}`
        - `Statements s :: skip |x <- e |*{e} <- e | s;s |if e then s else s|while e do s`
      - Zdefiniować dla nich small-step semantics (patrz książka), tłumaczenie, oraz udowodnić zgodność tłumaczenia z semantyką.
+    (rezerwacja B, KS, JS)    
 
 2. **Hoare logic (C):**
    - Dla imperatrywnego języka z pamięcią (patrz rodział 14):
@@ -48,9 +49,5 @@ Projekt oddany być musi przez załączenie do niego publicznego repozytorium, w
 
 8. **Formalizacja logiki rachunku zdań (pełność i zgodność)**:
     - [https://akaposi.github.io/proplogic.pdf]
-
-
-
-
-
+    (rezerwacja KB, AW, ZB)
 
