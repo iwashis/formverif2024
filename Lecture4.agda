@@ -14,6 +14,8 @@ postulate extensionality : ∀ {A B : Set} {f g : A → B}
                   -----------------------
                 → f ≡ g
 
+_∘_ : ∀ { A  B C : Set } → (B → C) → (A → B) → ( A → C )
+g ∘ f = λ x → g ( f x  )
 
 _+′_ : ℕ → ℕ → ℕ
 m +′ zero  = m
@@ -48,3 +50,35 @@ open _≃_
 ≃-refl =  record { to = λ x → x; from = λ y → y; from∘to = refl ; to∘from = refl }
 ≃-sym : ∀ {A B : Set} → A ≃ B → B ≃ A
 ≃-sym A≃B = record { to = from A≃B ; from = to A≃B ; from∘to = to∘from A≃B ; to∘from = from∘to A≃B   }
+
+
+-- ćwiczenia --
+--
+≃-trans : ∀ {A B C : Set}
+  → A ≃ B
+  → B ≃ C
+    -----
+  → A ≃ C
+≃-trans AB BC = record { to = (to BC) ∘ (to AB) ;
+                        from = (from AB) ∘ (from BC) ;
+                        from∘to = λ { x } → {!!} ;
+                        to∘from = {!!} }
+
+infix 0 _≲_
+record _≲_ (A B : Set) : Set where
+  field
+    to   : A → B
+    from : B → A
+    from∘to : ∀ (x : A) → from (to x) ≡ x
+open _≲_
+
+data FakeBool : Set where
+  tt : FakeBool
+  ff : FakeBool
+
+_ : FakeBool ≲ ℕ
+_  = record { to = λ { tt → 0 ; ff → 1 } ;
+              from = λ { zero → tt ; ( suc n ) → ff };
+              from∘to = λ { tt → refl ; ff → refl } }
+≲-refl : ∀ { A } →  A ≲ A
+≲-refl = record { to = λ z → z ; from = λ z → z ; from∘to = λ _ → refl }
