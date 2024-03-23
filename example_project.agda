@@ -114,7 +114,7 @@ data _↘_ : Config → Config → Set where
             ------------------------------------------------------
             → ⟨ σ , (int m) ⊗ (int n) ⟩ ↘ ⟨ σ , int ( m * n ) ⟩
 
-  asg : ∀ { σ σ' : Cntxt } → ∀ { x : Var } → ∀ { n : ℕ } → ∀ { e₁ e₁' e₂ }
+  asg : ∀ { σ σ' : Cntxt } → ∀ { x : Var } → ∀ { e₁ e₁' e₂ }
             → ⟨ σ , e₁ ⟩ ↘ ⟨ σ' , e₁' ⟩
             ------------------------------------------------------
             → ⟨ σ , (x ≔ e₁ ⨾ e₂) ⟩ ↘ ⟨ σ' , (x ≔ e₁' ⨾ e₂) ⟩
@@ -222,5 +222,5 @@ theorem₁ (leftmul x andThen x₁) = {!!}
 theorem₁ (rightmul x andThen x₁) = {!!}
 theorem₁ {σ} {σ'} {e} {n} ((mul {σ} {m₁} {m₂}) andThen step) with lemma₁ step | lemma₂ step | lemma₄ {σ} {σ'} {m₁} {m₂} {n} step
 ... | refl | refl | refl = mul intrefl intrefl
-theorem₁ {σ} {σ'} {e} {n} (asg smol andThen step) = {!!}
+theorem₁ {σ} {σ'} {e} {n} ((asg { σ } { σ'' } {x} { e' } { e'' } { e''' } smol) andThen step) = asg {σ} {σ'} {σ''} {!!} {!!}
 theorem₁ (asgint andThen step) = asg intrefl (theorem₁ step)
