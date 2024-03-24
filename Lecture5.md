@@ -272,3 +272,147 @@ Zadanie 3. Udowodnić:
       --------------
     → ¬ (∀ x → B x)
 ```
+
+
+---------------------
+
+
+-> # Wartości Boole'owskie i rozstrzygalność <-
+===============
+
+Importy:
+```
+import Relation.Binary.PropositionalEquality as Eq
+open Eq using (_≡_; refl)
+open Eq.≡-Reasoning
+open import Data.Nat using (ℕ; zero; suc)
+open import Data.Product using (_×_) renaming (_,_ to ⟨_,_⟩)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Relation.Nullary using (¬_)
+open import Relation.Nullary.Negation using ()
+  renaming (contradiction to ¬¬-intro)
+open import Data.Unit using (⊤; tt)
+open import Data.Empty using (⊥; ⊥-elim)
+```
+
+Przypomnijmy:
+```
+infix 4 _≤_
+
+data _≤_ : ℕ → ℕ → Set where
+
+  z≤n : ∀ {n : ℕ}
+      --------
+    → zero ≤ n
+
+  s≤s : ∀ {m n : ℕ}
+    → m ≤ n
+      -------------
+    → suc m ≤ suc n
+```
+gdzie mamy:
+```
+2≤4 : 2 ≤ 4
+2≤4 = s≤s (s≤s z≤n)
+
+¬4≤2 : ¬ (4 ≤ 2)
+¬4≤2 (s≤s (s≤s ()))
+```
+
+Ale można też tak:
+
+```
+data Bool : Set where
+  true  : Bool
+  false : Bool
+
+infix 4 _≤ᵇ_
+
+_≤ᵇ_ : ℕ → ℕ → Bool
+zero ≤ᵇ n       =  true
+suc m ≤ᵇ zero   =  false
+suc m ≤ᵇ suc n  =  m ≤ᵇ n
+```
+
+---------------------
+
+-> # Łączenie świadków z obliczeniami <-
+===============
+
+```
+T : Bool → Set
+T true   =  ⊤
+T false  =  ⊥
+
+T→≡ : ∀ (b : Bool) → T b → b ≡ true
+≡→T : ∀ {b : Bool} → b ≡ true → T b
+```
+
+Możemy udowodnić:
+
+
+```
+≤ᵇ→≤ : ∀ (m n : ℕ) → T (m ≤ᵇ n) → m ≤ n
+≤→≤ᵇ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ n)
+```
+
+Zdefiniujmy:
+```
+data Dec (A : Set) : Set where
+  yes :   A → Dec A
+  no  : ¬ A → Dec A
+```
+Przypomnijmy sobie:
+```
+¬s≤z : ∀ {m : ℕ} → ¬ (suc m ≤ zero)
+¬s≤z ()
+
+¬s≤s : ∀ {m n : ℕ} → ¬ (m ≤ n) → ¬ (suc m ≤ suc n)
+¬s≤s ¬m≤n (s≤s m≤n) = ¬m≤n m≤n
+```
+oraz pokażmy:
+```
+_≤?_ : ∀ (m n : ℕ) → Dec (m ≤ n)
+```
+Ponadto, możemy powyższe pokazać następująco:
+```
+_≤?′_ : ∀ (m n : ℕ) → Dec (m ≤ n)
+m ≤?′ n with m ≤ᵇ n | ≤ᵇ→≤ m n | ≤→≤ᵇ {m} {n}
+...        | true   | p        | _            = yes (p tt)
+...        | false  | _        | ¬p           = no ¬p
+```
+
+
+
+
+--------------------
+
+-> # Łączenie świadków z obliczeniami <-
+===============
+
+
+Zdefiniujmy:
+```
+⌊_⌋ : ∀ {A : Set} → Dec A → Bool
+⌊ yes x ⌋  =  true
+⌊ no ¬x ⌋  =  false
+```
+Wtedy mamy:
+```
+_≤ᵇ′_ : ℕ → ℕ → Bool
+m ≤ᵇ′ n  =  ⌊ m ≤? n ⌋
+```
+
+Ponadto, mamy:
+```
+toWitness : ∀ {A : Set} {D : Dec A} → T ⌊ D ⌋ → A
+fromWitness : ∀ {A : Set} {D : Dec A} → A → T ⌊ D ⌋
+```
+Wtedy:
+```
+≤ᵇ′→≤ : ∀ {m n : ℕ} → T (m ≤ᵇ′ n) → m ≤ n
+≤ᵇ′→≤  =  toWitness
+
+≤→≤ᵇ′ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ′ n)
+≤→≤ᵇ′  =  fromWitness
+```
