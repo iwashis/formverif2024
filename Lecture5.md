@@ -113,11 +113,12 @@ nonrefl : ∀ { n } → ¬ (n < n)
 -> # Ćwiczenia <-
 ===============
 
-Udowodnić:
+Udowodnić (do domu):
 ```
 ¬ (A ⊎ B) ≃ (¬ A) × (¬ B)
 ```
 
+(Do domu) 
 Pokazać, że każda z następujących własności implikuje pozostałe:
 
 ```
@@ -228,7 +229,7 @@ syntax ∃-syntax (λ x → B) = ∃[ x ] B
 -> # Kwantyfikatory: zadania <-
 ===============
 
-Zadanie 1. Udowodnić:
+Zadanie 1 (do domu). Udowodnić:
 ```
 ∃-distrib-⊎ : ∀ {A : Set} {B C : A → Set} →
     ∃[ x ] (B x ⊎ C x) ≃ (∃[ x ] B x) ⊎ (∃[ x ] C x)
@@ -245,7 +246,7 @@ Zadanie 1. Udowodnić:
 ===============
 
 
-Zadanie 2. Przypomnijmy:
+Zadanie 2 (zrobione na zajęciach). Przypomnijmy:
 ```
 data even : ℕ → Set
 data odd  : ℕ → Set
@@ -271,7 +272,7 @@ data odd where
 ===============
 
 
-Udowodnić:
+Udowodnić (dwa ostatnie do domu):
 ```
 even-∃ : ∀ {n : ℕ} → even n → ∃[ m ] (    m * 2 ≡ n)
 odd-∃  : ∀ {n : ℕ} →  odd n → ∃[ m ] (1 + m * 2 ≡ n)
@@ -288,7 +289,7 @@ odd-∃  : ∀ {n : ℕ} →  odd n → ∃[ m ] (1 + m * 2 ≡ n)
 
 
 
-Zadanie 3. Udowodnić:
+Zadanie 3 (do domu). Udowodnić:
 ```
 ¬∃≃∀¬ : ∀ {A : Set} {B : A → Set}
   → (¬ ∃[ x ] B x) ≃ ∀ x → ¬ B x
