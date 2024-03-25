@@ -264,6 +264,13 @@ data odd where
     → odd (suc n)
 ```
 
+---------------------
+
+
+-> # Kwantyfikatory: zadania <-
+===============
+
+
 Udowodnić:
 ```
 even-∃ : ∀ {n : ℕ} → even n → ∃[ m ] (    m * 2 ≡ n)
@@ -345,6 +352,7 @@ gdzie mamy:
 ¬4≤2 : ¬ (4 ≤ 2)
 ¬4≤2 (s≤s (s≤s ()))
 ```
+
 ---------------------
 
 
@@ -388,6 +396,11 @@ Możemy udowodnić:
 ≤ᵇ→≤ : ∀ (m n : ℕ) → T (m ≤ᵇ n) → m ≤ n
 ≤→≤ᵇ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ n)
 ```
+---------------------
+
+-> # Łączenie świadków z obliczeniami <-
+===============
+
 
 Zdefiniujmy:
 ```
