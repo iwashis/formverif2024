@@ -237,6 +237,14 @@ Zadanie 1. Udowodnić:
     ∃[ x ] (B x × C x) → (∃[ x ] B x) × (∃[ x ] C x)
 ```
 
+
+---------------------
+
+
+-> # Kwantyfikatory: zadania <-
+===============
+
+
 Zadanie 2. Przypomnijmy:
 ```
 data even : ℕ → Set
@@ -255,6 +263,7 @@ data odd where
       -----------
     → odd (suc n)
 ```
+
 Udowodnić:
 ```
 even-∃ : ∀ {n : ℕ} → even n → ∃[ m ] (    m * 2 ≡ n)
@@ -262,6 +271,15 @@ odd-∃  : ∀ {n : ℕ} →  odd n → ∃[ m ] (1 + m * 2 ≡ n)
 ∃-even : ∀ {n : ℕ} → ∃[ m ] (    m * 2 ≡ n) → even n
 ∃-odd  : ∀ {n : ℕ} → ∃[ m ] (1 + m * 2 ≡ n) →  odd n
 ```
+
+
+---------------------
+
+
+-> # Kwantyfikatory: zadania <-
+===============
+
+
 
 Zadanie 3. Udowodnić:
 ```
@@ -295,6 +313,15 @@ open import Data.Unit using (⊤; tt)
 open import Data.Empty using (⊥; ⊥-elim)
 ```
 
+
+
+---------------------
+
+
+-> # Wartości Boole'owskie i rozstrzygalność <-
+===============
+
+
 Przypomnijmy:
 ```
 infix 4 _≤_
@@ -318,6 +345,12 @@ gdzie mamy:
 ¬4≤2 : ¬ (4 ≤ 2)
 ¬4≤2 (s≤s (s≤s ()))
 ```
+---------------------
+
+
+-> # Wartości Boole'owskie i rozstrzygalność <-
+===============
+
 
 Ale można też tak:
 
@@ -381,8 +414,6 @@ m ≤?′ n with m ≤ᵇ n | ≤ᵇ→≤ m n | ≤→≤ᵇ {m} {n}
 ...        | true   | p        | _            = yes (p tt)
 ...        | false  | _        | ¬p           = no ¬p
 ```
-
-
 
 
 --------------------
