@@ -1,6 +1,6 @@
-%title: Metody Formalne, wykład 5 
+%title: Metody Formalne, wykład 5, 6, 7 
 %author: Tomasz Brengos
-%date: 2024-03-25
+%date: 2024-03-25, 2024-04-09
 
 
 -> # Początek pliku <- 
@@ -460,4 +460,27 @@ Wtedy:
 
 ≤→≤ᵇ′ : ∀ {m n : ℕ} → m ≤ n → T (m ≤ᵇ′ n)
 ≤→≤ᵇ′  =  fromWitness
+```
+
+--------------------
+
+-> # Łączenie świadków z obliczeniami <-
+===============
+
+
+Rozważmy (niewygodną) funkcję:
+```agda
+minus : (m n : ℕ) (n≤m : n ≤ m) → ℕ
+```
+
+```agda
+_ : minus 5 3 (s≤s (s≤s (s≤s z≤n))) ≡ 2
+_ = refl
+```
+
+A teraz:
+
+```agda 
+_-_ : (m n : ℕ) {n≤m : T ⌊ n ≤? m ⌋} → ℕ
+_-_ m n {n≤m} = minus m n (toWitness n≤m)
 ```
